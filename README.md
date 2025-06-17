@@ -34,18 +34,5 @@ Before running the project, ensure that you have the following installed:
    cd springboot-book-api
 
    
-## Project Structure
 
-├── src
-│   ├── main
-│   │   ├── java
-│   │   │   └── com
-│   │   │       └── example
-│   │   │           ├── controller
-│   │   │           │   └── BookController.java  # REST API controller
-│   │   │           └── entity
-│   │   │               └── Book.java            # Book entity
-│   │   ├── resources
-│   │   │   └── application.properties           # Spring Boot configuration
-└── pom.xml                                       # Maven build file
 
