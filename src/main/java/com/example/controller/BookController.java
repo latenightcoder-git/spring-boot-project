@@ -1,87 +1,67 @@
 package com.example.controller;
 
 import com.example.entity.Book;
+import com.example.service.BookService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("/api/books")
+@RequestMapping("api")
+@AllArgsConstructor
 public class BookController {
-    private final List<Book> books = new ArrayList<>();
-    public BookController() {
-        initializeBooks();
+
+    private final BookService bookService;
+
+    // 1. Create a New Book
+    @PostMapping("/books")
+    public ResponseEntity<Book> createBook(@RequestBody Book book) {
+        return new ResponseEntity<>(bookService.saveBook(book), HttpStatus.CREATED);
     }
 
-    private void initializeBooks() {
-        books.addAll(List.of(
-                new Book("Crime and Punishment","Fyodor Dostoevsky","Existentialism"),
-                new Book("Meditations","Marcus Aurelius","Stoicism"),
-                new Book("The Republic","Plato","Political Philosophy"),
-                new Book("Linux for Hackers","OccupyTheWeb","Cybersecurity"),
-                new Book("The Web Application Hacker's Handbook","Dafydd Stuttard & Marcus Pinto","Web Security"),
-                new Book("The Art of Exploitation","John Erickson","Hacking")
-                ));
+    // 2. Get All Books
+    @GetMapping("/books")
+    public ResponseEntity<List<Book>> getAllBooks() {
+        return ResponseEntity.ok(bookService.getAllBooks());
     }
 
-    @GetMapping
-    public List<Book> getBooks(@RequestParam(required = false) String category) {
-        if (category == null) {
-            return books;
-        }
-        return books.stream()
-                .filter(book -> book.getCategory().equalsIgnoreCase(category))
-                .toList();
+    // 3. Get Book by ID
+    @GetMapping("/books/{id}")
+    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+        return ResponseEntity.ok(bookService.getBookById(id));
     }
 
-    @GetMapping("/{title}")
-    public Book getBookByTitle(@PathVariable String title) {
-        return books.stream()
-                .filter(book -> book.getTitle().equalsIgnoreCase(title))
-                .findFirst()
-                .orElse(null);
+    // 4. Update Book
+    @PutMapping("/books/{id}")
+    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book bookDetails) {
+        return ResponseEntity.ok(bookService.updateBook(id, bookDetails));
     }
 
-    @GetMapping("/booksall")
-    public Stream<Book> getBooksStream() {
-        return Stream.of(
-                new Book("Crime and Punishment","Fyodor Dostoevsky","Existentialism"),
-                new Book("Meditations","Marcus Aurelius","Stoicism"),
-                new Book("The Republic","Plato","Political Philosophy"),
-                new Book("Linux for Hackers","OccupyTheWeb","Cybersecurity"),
-                new Book("The Web Application Hacker's Handbook","Dafydd Stuttard & Marcus Pinto","Web Security"),
-                new Book("The Art of Exploitation","John Erickson","Hacking")
-        );
+    // 5. Delete Book
+    @DeleteMapping("/books/{id}")
+    public ResponseEntity<String> deleteBook(@PathVariable Long id) {
+        bookService.deleteBook(id);
+        return ResponseEntity.ok("Book with ID " + id + " has been deleted successfully.");
     }
 
-    @PostMapping("/create")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Book createBook(@RequestBody Book newBook) {
-        boolean isNewBook = books.stream()
-                .noneMatch(book -> book.getTitle().equalsIgnoreCase(newBook.getTitle()));
-        if (isNewBook) {
-            books.add(newBook);
-        }
-        return newBook;
+    // 6. Search by Title (Exact)
+    @GetMapping("/books/search/title")
+    public ResponseEntity<Book> getBookByTitle(@RequestParam String name) {
+        return ResponseEntity.ok(bookService.getBookByTitle(name));
     }
 
-    @PutMapping("/{title}")
-    public void updateBook(@PathVariable String title, @RequestBody Book updatedBook) {
-        for (int i = 0; i < books.size(); i++) {
-            if (books.get(i).getTitle().equalsIgnoreCase(title)) {
-                books.set(i, updatedBook);
-                return;
-            }
-        }
+    // 7. Search by Title Keyword (Like search bar)
+    @GetMapping("/books/search/keyword")
+    public ResponseEntity<List<Book>> searchByKeyword(@RequestParam String key) {
+        return ResponseEntity.ok(bookService.getBooksByTitleKeyword(key));
     }
 
-    @DeleteMapping("/{title}")
-    public void deleteBook(@PathVariable String title) {
-        books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
+    // 8. Search by Author
+    @GetMapping("/books/search/author")
+    public ResponseEntity<List<Book>> getBooksByAuthor(@RequestParam String name) {
+        return ResponseEntity.ok(bookService.getBooksByAuthor(name));
     }
 }
-
