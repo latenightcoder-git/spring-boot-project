@@ -74,7 +74,7 @@ A step-by-step demonstration of resilient deletion and custom error handling.
 **Step C: Verification & Global Exception Handling**
 Attempting to fetch the deleted record triggers our custom `BookNotFoundException`.
 ![Deleted Book Verification](./Output_Images/deleted_book.png)
-![Global Exception Handler Proof](./Output_Images/get_book_by_id_exception_notf.png)
+![Global Exception Handler Proof](./Output_Images/get_book_by_id_exception_notfound.png)
 
 ---
 
